@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JW Player - Tigo Live</title>
+    <!-- Incluimos la librería de JW Player (Cargador base) -->
+    <script src="https://ssl.p.jwpcdn.com/player/v/8.21.0/jwplayer.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #player-container {
+            width: 100%;
+            max-width: 960px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="player-container">
+        <div id="my-video"></div>
+    </div>
+
+    <script>
+        const setup = jwplayer("my-video").setup({
+            playlist: [{
+                file: "https://sam-py-edge05.tigo.com.py/ccur-session/7f6e3fdb59994965abed8dd5c6faccf517487270122031b65a320aeed11ebae01d90082191a3c1a5MrOL1SVX7zpX7GuV2tRmo/rolling-buffer/APP_CHN1/APP_CHN1/transmux/index.mpd",
+                type: "dash",
+                drm: {
+                    clearkey: {
+                        keyId: "1c62a216a5fe423f959cb1ca02f62d83",
+                        key: "54f2fdc83c1da33cd9269bf21e08218c"
+                    }
+                }
+            }],
+            width: "100%",
+            aspectratio: "16:9",
+            autostart: true,
+            mute: false,
+            // Configuración adicional para estabilidad
+            playbackRateControls: true,
+            displaytitle: true
+        });
+
+        // Manejo de errores en consola
+        setup.on('error', function(e) {
+            console.error("Error de JW Player:", e.message);
+        });
+
+        setup.on('setupError', function(e) {
+            console.error("Error de configuración:", e.message);
+        });
+    </script>
+</body>
+</html>
