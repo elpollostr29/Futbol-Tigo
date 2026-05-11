@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shaka Player - Tigo MPD</title>
+    <!-- Cargamos Shaka Player desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+        #video-container {
+            width: 90%;
+            max-width: 960px;
+            background: #000;
+            position: relative;
+        }
+        video {
+            width: 100%;
+            display: block;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="video-container">
+        <video id="video" controls autoplay></video>
+    </div>
+
+    <script>
+        // Datos proporcionados
+        const manifestUri = 'https://sam-py-edge05.tigo.com.py/ccur-session/01_549061181/rolling-buffer/APP_CHN1/APP_CHN1/transmux/index.mpd';
+        
+        // Formato ClearKey: { "KID": "KEY" }
+        const clearKeys = {
+            '1c62a216a5fe423f959cb1ca02f62d83': '54f2fdc83c1da33cd9269bf21e08218c'
+        };
+
+        async function initApp() {
+            // Instalar pollyfills para compatibilidad
+            shaka.polyfill.installAll();
+
+            if (shaka.Player.isBrowserSupported()) {
+                initPlayer();
+            } else {
+                console.error('Navegador no compatible con Shaka Player.');
+            }
+        }
+
+        async function initPlayer() {
+            const video = document.getElementById('video');
+            const player = new shaka.Player(video);
+
+            // Manejo de errores
+            player.addEventListener('error', (event) => {
+                console.error('Error Code:', event.detail.code, 'Data:', event.detail);
+            });
+
+            // Configuración del DRM ClearKey
+            player.configure({
+                drm: {
+                    clearKeys: clearKeys
+                },
+                manifest: {
+                    dash: {
+                        // Útil para transmisiones en vivo que puedan tener problemas de reloj
+                        ignoreMinBufferTime: true 
+                    }
+                }
+            });
+
+            try {
+                await player.load(manifestUri);
+                console.log('El video se ha cargado correctamente.');
+            } catch (error) {
+                console.error('Error al cargar el manifiesto:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
